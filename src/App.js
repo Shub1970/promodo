@@ -1,57 +1,140 @@
 import "./App.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState, useEffect } from "react";
 function App() {
+  const [time, setTime] = useState(0);
+  const [startstop, setStartstop] = useState(false);
+  const [minute, setMinute] = useState(10);
+  const [second, setSecond] = useState(0);
+  const [br, setBr] = useState(5);
+  const [session, setSession] = useState(10);
+  const reset = () => {
+    clearInterval(time);
+    setSecond(0);
+
+    setMinute(25);
+    setTime(0);
+  };
+  ///starting
+  useEffect(() => {
+    if (startstop) {
+      if (!time) {
+        const inter = setInterval(() => {
+          setSecond((prev) => (prev === 0 ? 60 : prev - 1));
+          setTime(inter);
+        }, 500);
+      }
+    } else {
+      clearInterval(time);
+      setTime(0);
+    }
+  }, [startstop]);
+
+  useEffect(() => {
+    if (second === 0 && startstop) {
+      setMinute((prev) => prev - 1);
+    }
+    if (second === 0 && minute === 0) {
+      setMinute(br);
+    }
+  }, [second, startstop]);
+  /// session control
+  useEffect(() => {
+    if (!startstop) {
+      clearInterval(time);
+      setMinute(session);
+      setSecond(0);
+    }
+  }, [session]);
+  //// session end
   return (
     <div className="App">
-      <div class="main-title">25 + 5 Clock</div>
+      <div className="main-title">25 + 5 Clock</div>
       <div className="upper-slip">
-        <div class="length-control">
+        <div className="length-control">
           <h2 id="break-label">Break Length</h2>
           <div className="timer-control">
-            <button class="btn-level" id="break-decrement" value="-">
-              <FontAwesomeIcon icon="fas fa-long-arrow-down" />
+            <button
+              className="btn-level"
+              id="break-decrement"
+              value="-"
+              onClick={() => {
+                if (!startstop) {
+                  setBr((pre) => (1 < pre ? pre - 1 : 1));
+                }
+              }}
+            >
+              <i className="fas fa-arrow-down"></i>
             </button>
-            <div class="btn-level" id="break-length">
-              5
+            <div className="btn-level" id="break-length">
+              <h2>{br}</h2>
             </div>
-            <button class="btn-level" id="break-increment" value="+">
-              <FontAwesomeIcon icon="fas fa-long-arrow-up" />
+            <button
+              className="btn-level"
+              id="break-increment"
+              value="+"
+              onClick={() => {
+                if (!startstop) {
+                  setBr((previous) => (60 > previous ? previous + 1 : 60));
+                }
+              }}
+            >
+              <i className="fas fa-arrow-up"></i>
             </button>
           </div>
         </div>
-        <div class="length-control">
+        <div className="length-control">
           <h2 id="session-label">Session Length</h2>
           <div className="timer-control">
-            <button class="btn-level" id="session-decrement" value="-">
-              <FontAwesomeIcon icon="fas fa-long-arrow-down" />
+            <button
+              className="btn-level"
+              id="session-decrement"
+              value="-"
+              onClick={() => {
+                if (!startstop) {
+                  setSession((pre) => (1 < pre ? pre - 1 : 1));
+                }
+              }}
+            >
+              <i className="fas fa-arrow-down"></i>
             </button>
-            <div class="btn-level" id="session-length">
-              25
+            <div className="btn-level" id="session-length">
+              <h2>{session}</h2>
             </div>
-            <button class="btn-level" id="session-increment" value="+">
-              <FontAwesomeIcon icon="fas fa-long-arrow-up" />
+            <button
+              className="btn-level"
+              id="session-increment"
+              value="+"
+              onClick={() => {
+                if (!startstop) {
+                  setSession((previous) => (60 > previous ? previous + 1 : 60));
+                }
+              }}
+            >
+              <i className="fas fa-arrow-up"></i>
             </button>
           </div>
         </div>
       </div>
       <div>
-        <div class="timer-wrapper">
+        <div className="timer-wrapper">
           <h2 id="timer-label">Session</h2>
-          <h2 id="time-left">25:00</h2>
+          <h2 id="time-left">
+            {minute < 10 ? "0" + minute : minute}:
+            {second < 10 ? "0" + second : second}
+          </h2>
         </div>
       </div>
-      <div class="timer-control" style={{ width: "200px" }}>
-        <button id="start">
-          <FontAwesomeIcon icon="fas fa-start" />
-          start
-        </button>
-        <button id="pause">
-          <FontAwesomeIcon icon="fas fa-pause" />
-          pause
+      <div className="timer-control" style={{ width: "200px" }}>
+        <button
+          id="start_stop"
+          onClick={() => {
+            setStartstop((prev) => !prev);
+          }}
+        >
+          <i className="fas fa-play"></i>
         </button>
         <button id="reset">
-          <FontAwesomeIcon icon="fas fa-sync-alt" />
-          reset
+          <i className="fas fa-redo-alt" onClick={reset}></i>
         </button>
       </div>
     </div>
