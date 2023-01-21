@@ -3,14 +3,16 @@ import { useState, useEffect } from "react";
 function App() {
   const [time, setTime] = useState(0);
   const [startstop, setStartstop] = useState(false);
-  const [minute, setMinute] = useState(10);
+  const [minute, setMinute] = useState(25);
   const [second, setSecond] = useState(0);
   const [br, setBr] = useState(5);
-  const [session, setSession] = useState(10);
+  const [session, setSession] = useState(25);
+  const [label, setLable] = useState("session");
   const reset = () => {
     clearInterval(time);
     setSecond(0);
-
+    setSession(25);
+    setBr(5);
     setMinute(25);
     setTime(0);
   };
@@ -34,6 +36,7 @@ function App() {
       setMinute((prev) => prev - 1);
     }
     if (second === 0 && minute === 0) {
+      setLable("Break");
       setMinute(br);
     }
   }, [second, startstop]);
@@ -46,6 +49,7 @@ function App() {
     }
   }, [session]);
   //// session end
+
   return (
     <div className="App">
       <div className="main-title">25 + 5 Clock</div>
@@ -117,7 +121,7 @@ function App() {
       </div>
       <div>
         <div className="timer-wrapper">
-          <h2 id="timer-label">Session</h2>
+          <h2 id="timer-label">{label}</h2>
           <h2 id="time-left">
             {minute < 10 ? "0" + minute : minute}:
             {second < 10 ? "0" + second : second}
