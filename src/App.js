@@ -1,6 +1,14 @@
 import "./App.css";
 import { useState, useEffect, useRef } from "react";
 function App() {
+  const [clock, setClock] = useState({
+    inter: 0,
+    startstop: false,
+    time: 1500,
+    br: 5,
+    session: 25,
+    label: "Session",
+  });
   const [inter, setInter] = useState(0);
   const [startstop, setStartstop] = useState(false);
   const [time, setTime] = useState(25 * 60);
@@ -8,7 +16,6 @@ function App() {
   const [session, setSession] = useState(25);
   const [label, setLable] = useState("Session");
   const reference = useRef(null);
-
   const reset = () => {
     clearInterval(inter);
     setInter(0);
@@ -49,20 +56,21 @@ function App() {
   }, [startstop, inter]);
   ///
   useEffect(() => {
-    if (time === 0 && label === "Session") {
-      setTime(br * 60);
-      setLable("Break");
-      reference.current.play();
+    if (time === 0) {
+      if (label === "Session") {
+        setTime(br * 60);
+        setLable("Break");
+        reference.current.play();
+      } else {
+        setTime(session * 60);
+        setLable("Session");
+        reference.current.play();
+      }
     }
-    if (time === 0 && label === "Break") {
-      setTime(session * 60);
-      setLable("Session");
-      reference.current.play();
-    }
-  });
-  useEffect(() => {
-    console.log(time);
   }, [time]);
+  // useEffect(() => {
+  //   console.log(`${time}--${label}`);
+  // }, [time]);
   //controling session
   useEffect(() => {
     clearInterval(inter);
