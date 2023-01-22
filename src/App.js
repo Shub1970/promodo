@@ -1,64 +1,69 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 function App() {
-  const [time, setTime] = useState(0);
+  const [inter, setInter] = useState(0);
   const [startstop, setStartstop] = useState(false);
-  const [minute, setMinute] = useState(25);
-  const [second, setSecond] = useState(0);
+  const [time, setTime] = useState(25 * 60);
   const [br, setBr] = useState(5);
   const [session, setSession] = useState(25);
   const [label, setLable] = useState("Session");
   const reset = () => {
+    clearInterval(inter);
+    setInter(0);
     setStartstop(false);
-    clearInterval(time);
-    setSecond(0);
     setSession(25);
     setBr(5);
-    setMinute(25);
-    setTime(0);
+    setTime(25 * 60);
     setLable("Session");
   };
-  ///starting
+
+  ///displaying the timer
+  const returnms = (pros) => {
+    let min = Math.floor(pros / 60);
+    let sec = pros - min * 60;
+    if (min < 10) {
+      min = "0" + min;
+    }
+    if (sec < 10) {
+      sec = "0" + sec;
+    }
+    return min + ":" + sec;
+  }; ///display end
   useEffect(() => {
     if (startstop) {
-      if (!time) {
-        const inter = setInterval(() => {
-          setSecond((prev) => (prev === 0 ? 59 : prev - 1));
-          setTime(inter);
-        }, 10);
+      if (!inter) {
+        const int = setInterval(() => {
+          setTime((prev) => prev - 1);
+        }, 1000);
+        setInter(int);
       }
     } else {
-      clearInterval(time);
-      setTime(0);
+      clearInterval(inter);
+      setInter(0);
     }
-    return () => clearInterval(time);
-  }, [startstop, time]);
-
+    return () => clearInterval(inter);
+  }, [startstop, inter]);
+  ///
   useEffect(() => {
-    if (second === 0 && minute === 0 && label === "Session") {
+    if (time === 0 && label === "Session") {
+      console.log("cg to break");
+      setTime(br * 60);
       setLable("Break");
-      setMinute(br);
-      setSecond(0);
     }
-    if (second === 0 && minute === 0 && label === "Break") {
+    if (time === 0 && label === "Break") {
+      console.log("cg to sesseion");
+      setTime(session * 60);
       setLable("Session");
-      setMinute(session);
-      setSecond(0);
     }
-    if (second === 0 && startstop) {
-      setMinute((prev) => prev - 1);
-    }
-  }, [second, startstop]);
-  /// session control
+  });
   useEffect(() => {
-    if (!startstop) {
-      clearInterval(time);
-      setMinute(session);
-      setSecond(0);
-    }
+    console.log(time);
+  }, [time]);
+  //controling session
+  useEffect(() => {
+    clearInterval(inter);
+    setTime(session * 60);
   }, [session]);
-  //// session end
-
   return (
     <div className="App">
       <div className="main-title">25 + 5 Clock</div>
@@ -131,10 +136,7 @@ function App() {
       <div>
         <div className="timer-wrapper">
           <h2 id="timer-label">{label}</h2>
-          <h2 id="time-left">
-            {minute < 10 ? "0" + minute : minute}:
-            {second < 10 ? "0" + second : second}
-          </h2>
+          <h2 id="time-left">{returnms(time)}</h2>
         </div>
       </div>
       <div className="timer-control" style={{ width: "200px" }}>
