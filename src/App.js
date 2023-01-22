@@ -1,21 +1,24 @@
 import "./App.css";
 import { useState, useEffect, useRef } from "react";
 function App() {
-  const [inter, setInter] = useState(0);
-  const [startstop, setStartstop] = useState(false);
-  const [time, setTime] = useState(25 * 60);
-  const [br, setBr] = useState(5);
-  const [session, setSession] = useState(25);
-  const [label, setLable] = useState("Session");
   const reference = useRef(null);
+  const [clock, setClock] = useState({
+    inter: 0,
+    startstop: false,
+    time: 1500,
+    br: 5,
+    session: 25,
+    label: "session",
+  });
   const reset = () => {
-    clearInterval(inter);
-    setInter(0);
-    setStartstop(false);
-    setSession(25);
-    setBr(5);
-    setTime(25 * 60);
-    setLable("Session");
+    setClock({
+      inter: 0,
+      startstop: false,
+      time: 1500,
+      br: 5,
+      session: 25,
+      label: "session",
+    });
     reference.current.pause();
     reference.current.currentTime = 0;
   };
@@ -33,42 +36,39 @@ function App() {
     return min + ":" + sec;
   }; ///display end
   useEffect(() => {
-    if (startstop) {
-      if (!inter) {
+    if (clock.startstop) {
+      if (!clock.inter) {
         const int = setInterval(() => {
-          setTime((prev) => prev - 1);
+          setClock((prev) => {
+            return { ...prev, time: prev.time - 1 };
+          });
         }, 1000);
-        setInter(int);
+        setClock((prev) => {
+          return { ...prev, inter: int };
+        });
       }
     } else {
-      clearInterval(inter);
-      setInter(0);
+      clearInterval(clock.inter);
+      setClock({ ...clock, inter: 0 });
     }
-    return () => clearInterval(inter);
-  }, [startstop, inter]);
+    return () => clearInterval(clock.inter);
+  }, [clock.startstop, clock.inter]);
 
   useEffect(() => {
-    if (time === 0 && label === "Session") {
-      console.log("lable change");
-      setTime(br * 60);
-      setLable("Break");
+    if (clock.time === -1 && clock.label === "session") {
+      setClock({ ...clock, time: clock.br * 60, label: "break" });
+      reference.current.play();
+    } else if (clock.time === -1 && clock.label === "break") {
+      setClock({ ...clock, time: clock.session * 60, label: "session" });
       reference.current.play();
     }
-    if (time === 0 && label === "Break") {
-      console.log("lable change");
-      setTime(session * 60);
-      setLable("Session");
-      reference.current.play();
-    }
-  }, [time]);
-  useEffect(() => {
-    console.log(time);
-  }, [time]);
+  }, [clock.time]);
+
   //controling session
   useEffect(() => {
-    clearInterval(inter);
-    setTime(session * 60);
-  }, [session]);
+    clearInterval(clock.inter);
+    setClock({ ...clock, time: clock.session * 60 });
+  }, [clock.session]);
   return (
     <div className="App">
       <div className="main-title">25 + 5 Clock</div>
@@ -81,23 +81,27 @@ function App() {
               id="break-decrement"
               value="-"
               onClick={() => {
-                if (!startstop) {
-                  setBr((pre) => (1 < pre ? pre - 1 : 1));
+                if (!clock.startstop) {
+                  setClock((prev) => {
+                    return { ...prev, br: 1 < prev.br ? prev.br - 1 : 1 };
+                  });
                 }
               }}
             >
               <i className="fas fa-arrow-down"></i>
             </button>
             <div className="btn-level" id="break-length">
-              {br}
+              {clock.br}
             </div>
             <button
               className="btn-level"
               id="break-increment"
               value="+"
               onClick={() => {
-                if (!startstop) {
-                  setBr((previous) => (60 > previous ? previous + 1 : 60));
+                if (!clock.startstop) {
+                  setClock((prev) => {
+                    return { ...prev, br: 60 > prev.br ? prev.br + 1 : 60 };
+                  });
                 }
               }}
             >
@@ -113,23 +117,33 @@ function App() {
               id="session-decrement"
               value="-"
               onClick={() => {
-                if (!startstop) {
-                  setSession((pre) => (1 < pre ? pre - 1 : 1));
+                if (!clock.startstop) {
+                  setClock((prev) => {
+                    return {
+                      ...prev,
+                      session: 1 < prev.session ? prev.session - 1 : 1,
+                    };
+                  });
                 }
               }}
             >
               <i className="fas fa-arrow-down"></i>
             </button>
             <div className="btn-level" id="session-length">
-              {session}
+              {clock.session}
             </div>
             <button
               className="btn-level"
               id="session-increment"
               value="+"
               onClick={() => {
-                if (!startstop) {
-                  setSession((previous) => (60 > previous ? previous + 1 : 60));
+                if (!clock.startstop) {
+                  setClock((prev) => {
+                    return {
+                      ...prev,
+                      session: 60 > prev.session ? prev.session + 1 : 60,
+                    };
+                  });
                 }
               }}
             >
@@ -140,15 +154,17 @@ function App() {
       </div>
       <div>
         <div className="timer-wrapper">
-          <h2 id="timer-label">{label}</h2>
-          <h2 id="time-left">{returnms(time)}</h2>
+          <h2 id="timer-label">{clock.label}</h2>
+          <h2 id="time-left">{returnms(clock.time)}</h2>
         </div>
       </div>
       <div className="timer-control" style={{ width: "200px" }}>
         <button
           id="start_stop"
           onClick={() => {
-            setStartstop((prev) => !prev);
+            setClock((prev) => {
+              return { ...prev, startstop: !prev.startstop };
+            });
           }}
         >
           <i className="fas fa-play"></i>
