@@ -47,16 +47,6 @@ function App() {
     return () => clearInterval(inter);
   }, [startstop, inter]);
 
-  // const beepsound = () => {
-  //   reference.current.currentTime = 0;
-  //   reference.current.play();
-  //   console.log("audio start");
-  //   setTimeout(() => {
-  //     reference.current.pause();
-  //     console.log("stop");
-  //   }, 1000);
-  // };
-  ///
   useEffect(() => {
     if (time === 0 && label === "Session") {
       console.log("lable change");
@@ -66,7 +56,6 @@ function App() {
     }
     if (time === 0 && label === "Break") {
       console.log("lable change");
-
       setTime(session * 60);
       setLable("Session");
       reference.current.play();
