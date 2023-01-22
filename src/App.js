@@ -59,14 +59,17 @@ function App() {
   ///
   useEffect(() => {
     if (time === 0 && label === "Session") {
-      reference.current.play();
+      console.log("lable change");
       setTime(br * 60);
       setLable("Break");
+      reference.current.play();
     }
     if (time === 0 && label === "Break") {
-      reference.current.play();
+      console.log("lable change");
+
       setTime(session * 60);
       setLable("Session");
+      reference.current.play();
     }
   });
   useEffect(() => {
