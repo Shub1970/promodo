@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 function App() {
   const [inter, setInter] = useState(0);
   const [startstop, setStartstop] = useState(false);
@@ -7,6 +7,8 @@ function App() {
   const [br, setBr] = useState(5);
   const [session, setSession] = useState(25);
   const [label, setLable] = useState("Session");
+  const reference = useRef(null);
+
   const reset = () => {
     clearInterval(inter);
     setInter(0);
@@ -15,6 +17,8 @@ function App() {
     setBr(5);
     setTime(25 * 60);
     setLable("Session");
+    reference.current.pause();
+    reference.current.currentTime = 0;
   };
 
   ///displaying the timer
@@ -46,14 +50,14 @@ function App() {
   ///
   useEffect(() => {
     if (time === 0 && label === "Session") {
-      console.log("cg to break");
       setTime(br * 60);
       setLable("Break");
+      reference.current.play();
     }
     if (time === 0 && label === "Break") {
-      console.log("cg to sesseion");
       setTime(session * 60);
       setLable("Session");
+      reference.current.play();
     }
   });
   useEffect(() => {
@@ -151,6 +155,11 @@ function App() {
         <button id="reset" onClick={() => reset()}>
           <i className="fas fa-redo-alt"></i>
         </button>
+        <audio
+          id="beep"
+          ref={reference}
+          src="https://res.cloudinary.com/drpcjt13x/video/upload/v1599590677/Proyectos/Pomodoro%20Clock/bells003_ne9dwp.wav"
+        ></audio>
       </div>
     </div>
   );
