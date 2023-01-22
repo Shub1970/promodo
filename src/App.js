@@ -71,7 +71,7 @@ function App() {
       setLable("Session");
       reference.current.play();
     }
-  });
+  }, [time]);
   useEffect(() => {
     console.log(time);
   }, [time]);
