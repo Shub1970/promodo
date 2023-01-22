@@ -7,37 +7,46 @@ function App() {
   const [second, setSecond] = useState(0);
   const [br, setBr] = useState(5);
   const [session, setSession] = useState(25);
-  const [label, setLable] = useState("session");
+  const [label, setLable] = useState("Session");
   const reset = () => {
+    setStartstop(false);
     clearInterval(time);
     setSecond(0);
     setSession(25);
     setBr(5);
     setMinute(25);
     setTime(0);
+    setLable("Session");
   };
   ///starting
   useEffect(() => {
     if (startstop) {
       if (!time) {
         const inter = setInterval(() => {
-          setSecond((prev) => (prev === 0 ? 60 : prev - 1));
+          setSecond((prev) => (prev === 0 ? 59 : prev - 1));
           setTime(inter);
-        }, 500);
+        }, 10);
       }
     } else {
       clearInterval(time);
       setTime(0);
     }
-  }, [startstop]);
+    return () => clearInterval(time);
+  }, [startstop, time]);
 
   useEffect(() => {
-    if (second === 0 && startstop) {
-      setMinute((prev) => prev - 1);
-    }
-    if (second === 0 && minute === 0) {
+    if (second === 0 && minute === 0 && label === "Session") {
       setLable("Break");
       setMinute(br);
+      setSecond(0);
+    }
+    if (second === 0 && minute === 0 && label === "Break") {
+      setLable("Session");
+      setMinute(session);
+      setSecond(0);
+    }
+    if (second === 0 && startstop) {
+      setMinute((prev) => prev - 1);
     }
   }, [second, startstop]);
   /// session control
@@ -70,7 +79,7 @@ function App() {
               <i className="fas fa-arrow-down"></i>
             </button>
             <div className="btn-level" id="break-length">
-              <h2>{br}</h2>
+              {br}
             </div>
             <button
               className="btn-level"
@@ -102,7 +111,7 @@ function App() {
               <i className="fas fa-arrow-down"></i>
             </button>
             <div className="btn-level" id="session-length">
-              <h2>{session}</h2>
+              {session}
             </div>
             <button
               className="btn-level"
@@ -137,8 +146,8 @@ function App() {
         >
           <i className="fas fa-play"></i>
         </button>
-        <button id="reset">
-          <i className="fas fa-redo-alt" onClick={reset}></i>
+        <button id="reset" onClick={() => reset()}>
+          <i className="fas fa-redo-alt"></i>
         </button>
       </div>
     </div>
